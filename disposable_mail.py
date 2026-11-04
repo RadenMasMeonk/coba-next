@@ -5,7 +5,10 @@ from util import random_string
 
 
 class GuerrillaMail:
+    """Manages temporary disposable email via ulm-dsl.de API"""
+
     def __init__(self):
+        """Create new temporary email account"""
         self.username = random_string(8)
         self.email_address = f"{self.username}@ulm-dsl.de"
         response = requests.get(
@@ -22,6 +25,7 @@ class GuerrillaMail:
         print(f"Registered new e-mail address {self.email_address}.")
 
     def fetch_mail(self, email_id):
+        """Fetch specific email content by ID"""
         response = requests.get(
             f"https://ulm-dsl.de/mail-api.php?name={self.username}&id={email_id}"
         )
@@ -32,6 +36,7 @@ class GuerrillaMail:
         return response.content.decode("utf-8")
 
     def check_mail(self):
+        """Check for new emails and return latest email content"""
         response = feedparser.parse(
             f"https://ulm-dsl.de/inbox-api.php?name={self.username}"
         )

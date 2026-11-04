@@ -11,10 +11,12 @@ from config import MODELS_TMP_PATH
 
 
 def get_download_page_url(entry):
+    """Construct download page URL from model ID"""
     return "https://www.cgtrader.com/items/%s/download-page" % entry["id"]
 
 
 def generate_file_list(driver, entry):
+    """Generate list of files included in model download"""
     print("> Generate list of files...")
     assert (
         driver.current_url == entry["attributes"]["url"]
@@ -53,6 +55,7 @@ def generate_file_list(driver, entry):
 
 
 def generate_download_list(driver, entry):
+    """Generate list of downloadable files from download page"""
     print("> Generate list of downloads... ", end="", flush=True)
     assert (
         entry["id"] in driver.current_url
@@ -101,6 +104,7 @@ def generate_download_list(driver, entry):
 
 
 def download_files(driver, account_manager, entry, files="all", generate_list=True):
+    """Download model files to local directory"""
     download_all_files = files == "all"
 
     print("> Load download page and wait...")
@@ -213,4 +217,5 @@ def download_files(driver, account_manager, entry, files="all", generate_list=Tr
 
 
 def random_string(length):
+    """Generate random alphanumeric string for temporary account credentials"""
     return "".join(random.choices(string.ascii_uppercase + string.digits, k=length))

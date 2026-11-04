@@ -1,8 +1,10 @@
+# Configure Chrome browser with Selenium WebDriver
 from selenium.webdriver import ChromeOptions
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 
+# MIME types to auto-download without prompting
 MIME_TYPES = [
     "text/plain",
     "text/css",
@@ -74,10 +76,12 @@ MIME_TYPES = [
 
 
 def get_driver(download_folder):
+    """Create Chrome WebDriver instance with auto-download configuration"""
     chrome_options = ChromeOptions()
 
-    chrome_options.page_load_strategy = "eager"
+    chrome_options.page_load_strategy = "eager"  # Don't wait for full page load
 
+    # Configure Chrome to auto-download files to specified folder
     prefs = {
         "profile.default_content_settings.popups": 0,
         "download.default_directory": download_folder,
@@ -89,6 +93,7 @@ def get_driver(download_folder):
 
     chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
+    # Auto-download and configure correct ChromeDriver
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver

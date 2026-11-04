@@ -1,20 +1,27 @@
 import json
 import os.path
 
+# Get the directory where this script is located
 script_directory = os.path.dirname(os.path.realpath(__file__))
 
-# CONFIG
+# Load configuration from JSON file
 with open(os.path.join(script_directory, "config.json"), "r") as config_json:
     config = json.load(config_json)
+
+# Directory where downloaded models will be stored
 MODELS_BASE_PATH = (
     config["modelsBasePath"]
     if os.path.isabs(config["modelsBasePath"])
     else os.path.join(script_directory, config["modelsBasePath"])
 )
+
+# Temporary directory for partial downloads
 MODELS_TMP_PATH = os.path.join(MODELS_BASE_PATH, "tmp")
-OVERRIDE = config["override"]
-AUTO_RESTART = config["autoRestart"]
-VERBOSE = config.get("verbose", False)
+
+# Configuration options
+OVERRIDE = config["override"]          # Overwrite existing model directories
+AUTO_RESTART = config["autoRestart"]   # Restart script on fatal errors
+VERBOSE = config.get("verbose", False) # Print verbose output
 
 if __name__ == "__main__":
     for var_name in ["MODELS_BASE_PATH", "MODELS_TMP_PATH", "OVERRIDE", "AUTO_RESTART"]:
