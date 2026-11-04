@@ -152,12 +152,10 @@ if __name__ == "__main__":
                 print("XXXXXXXXXXXXXXXXXXXXXXXX")
                 print("Exception:")
                 print(exception)
-                print("Will kill all 'geckodriver'...")
-                os.system("killall geckodriver")
-                print("Will kill all Firefox marionettes...")
-                os.system(
-                    "for x in `ps ax | awk '!/awk/ && /firefox.*-marionette/' | awk '{print $1}'`; do kill \"$x\"; done"
-                )
+                print("Will kill all 'chromedriver'...")
+                os.system("taskkill /F /IM chromedriver.exe /T 2>nul")
+                print("Will kill all Chrome instances...")
+                os.system("taskkill /F /IM chrome.exe /T 2>nul")
                 print("Will restart.")
                 print("XXXXXXXXXXXXXXXXXXXXXXXX")
     else:

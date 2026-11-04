@@ -123,7 +123,8 @@ class AccountManager:
 
         self.driver.get("https://cgtrader.com")
 
-        while True:
+        max_retries = 20
+        for attempt in range(max_retries):
             try:
                 sleep(3)
                 self.driver.execute_script(
@@ -158,16 +159,18 @@ class AccountManager:
                 sleep(5)
                 if "verify-email" in self.driver.current_url:
                     break
-            # except ElementClickInterceptedException as intercepted:
-            #     print("intercepted!")
             except (NoSuchElementException, ElementNotInteractableException) as e:
+                if attempt + 1 >= max_retries:
+                    print("\nMax retries reached for account creation.")
+                    return
                 print("*", end="", flush=True)
                 sleep(1)
 
         print()
         print("Waiting for confirmation mail...")
 
-        while True:
+        max_mail_retries = 60
+        for attempt in range(max_mail_retries):
             mail = tempmail.check_mail()
             if (
                 mail is not None
@@ -179,6 +182,9 @@ class AccountManager:
                 confirmation_link = confirmation_link_regex.findall(mail)[0]
                 self.driver.get(confirmation_link)
                 break
+            if attempt + 1 >= max_mail_retries:
+                print("\nMax retries reached waiting for confirmation mail.")
+                return
             print("*", end="", flush=True)
             sleep(1)
 
@@ -195,7 +201,8 @@ class AccountManager:
         print("Logging in...")
         self.driver.get("https://cgtrader.com")
 
-        while True:
+        max_login_retries = 30
+        for attempt in range(max_login_retries):
             try:
                 sleep(3)
                 self.driver.execute_script(
@@ -220,14 +227,24 @@ class AccountManager:
                 ).click()
                 break
             except (NoSuchElementException, ElementNotInteractableException):
+                if attempt + 1 >= max_login_retries:
+                    print("\nMax login retries reached.")
+                    return
                 print("*", end="", flush=True)
                 sleep(1)
         print()
 
         print("Waiting for login to complete...")
-        while not self.driver.find_element(
-            "css selector", ".js-avatar-container"
-        ).is_displayed():
+        max_wait_retries = 60
+        for attempt in range(max_wait_retries):
+            try:
+                if self.driver.find_element("css selector", ".js-avatar-container").is_displayed():
+                    break
+            except NoSuchElementException:
+                pass
+            if attempt + 1 >= max_wait_retries:
+                print("\nMax wait retries reached for login.")
+                return
             print("*", end="", flush=True)
             sleep(1)
         print()
@@ -239,7 +256,8 @@ class AccountManager:
 
     def _logout(self):
         print("Logging out...")
-        while True:
+        max_logout_retries = 30
+        for attempt in range(max_logout_retries):
             try:
                 self.driver.find_element("css selector", ".avatar").click()
                 self.driver.implicitly_wait(1)
@@ -250,6 +268,9 @@ class AccountManager:
                 NoSuchElementException,
                 ElementClickInterceptedException,
             ):
+                if attempt + 1 >= max_logout_retries:
+                    print("\nMax logout retries reached.")
+                    return
                 print("*", end="", flush=True)
                 sleep(1)
         print()

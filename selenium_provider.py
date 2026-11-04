@@ -1,6 +1,7 @@
-# configure Firefox / Selenium
-from selenium.webdriver import FirefoxOptions
+from selenium.webdriver import ChromeOptions
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 
 MIME_TYPES = [
     "text/plain",
@@ -73,31 +74,21 @@ MIME_TYPES = [
 
 
 def get_driver(download_folder):
-    firefox_options = FirefoxOptions()
+    chrome_options = ChromeOptions()
 
-    firefox_options.page_load_strategy = "eager"
+    chrome_options.page_load_strategy = "eager"
 
-    # don't ask to send notifications
-    firefox_options.set_preference("dom.webnotifications.enabled", False)
+    prefs = {
+        "profile.default_content_settings.popups": 0,
+        "download.default_directory": download_folder,
+        "download.prompt_for_download": False,
+        "download.directory_upgrade": True,
+        "safebrowsing.enabled": True
+    }
+    chrome_options.add_experimental_option("prefs", prefs)
 
-    # download without asking to preconfigured folder
-    firefox_options.set_preference("browser.download.folderList", 2)
-    firefox_options.set_preference("browser.download.dir", download_folder)
-    firefox_options.set_preference(
-        "browser.helperApps.neverAsk.saveToDisk", ";".join(MIME_TYPES) + ";"
-    )
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
-    # don't show the download progress popup
-    firefox_options.set_preference("browser.download.panel.shown", False)
-
-    firefox_options.set_capability(
-        "moz:firefoxOptions",
-        {
-            "args": [
-                "-profile",
-            ]
-        },
-    )
-
-    driver = webdriver.Firefox(options=firefox_options)
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
